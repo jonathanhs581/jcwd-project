@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar HTML</title>
+</head>
+
+<body>
+    <h1>Easy Homemade Fried Rice</h1>
+    <p>Ini adalah halaman HTML pertama saya.</p>
+
+    <h2>Ingredients</h2>
+    <p>2 cups of cold cooked rice, 2 cloves of garlic, and 1 tablespoon of soy sauce</p>
+
+    <!-- h2: subb-bab / bagian utama resep-->
+    <h2>Cooking Steps</h2>
+
+    <h3>Step 1: preparation</h3>
+    <p>Chop the garlic finely and heat the oil in a pan</p>
+
+    <h3>Step 2: cooking</h3>
+
+    <h4>Safety Tip</h4>
+    <p>Be careful when adding rice to hot oil to avoid splashing.</p>
+
+    <h5>Chef's secret note</h5>
+    <p> Using day-old rice prevents it from getting mushy,</p>
+
+    <h6>Source: grandma's cookbook</h6>
+    <h2>Restaurant Location and contact</h2>
+    <p>
+        Grandma's kitchen street No.12 <br>
+        Downtown District, cityville <br>
+        Phone: (021) 555-019
+    </p>
+
+    <h2>Customer Reviews</h2>
+    <p>
+        <strong> warning; </strong> This dish contains peanuts; Please check for allergies before serving
+    </p>
+    <p>
+        This recipe is <em> really</em> easy to follow, even for complete beginners
+    </p>
+    <p>
+        Speciel offer: get a <mark> 50% discount</mark> on cooking classes this weekend
+    </p>
+    <p>
+        Please double-check your orering <u>adderss</u> before completing the payment
+    </p>
+
+    <!-- unordered & ordered list -->
+    <h2> ingredients checklist</h2>
+    <ul>
+        <li>2 cups of cold cooked rice</li>
+        <li>2 cloves of garlic</li>
+        <li>1 tablespoon of soy sauce</li>
+
+    </ul>
+
+    <ul type="circle">
+        <li>2 cups of cold cooked rice</li>
+        <li>2 cloves of garlic</li>
+        <li>1 tablespoon of soy sauce</li>
+
+    </ul>
+
+    <ul type="square">
+        <li> Alternative: olive oil instead of vegetable oil</li>
+    </ul>
+
+    <h2 id="instruction-section">Step-by-step instructions</h2>
+    <ol>
+        <li> prepare serving plate</li>
+        <li>garnish with cuucmber slices</li>
+    </ol>
+
+    <ol type="a">
+        <li> serve while hot</li>
+        <li> enjoy your meal!</li>
+    </ol>
+
+    <h2>Nutritional Information</h2>
+
+    <table border="1">
+        <tr>
+            <th>Category</th>
+            <th>nutrient</th>
+            <th>Amount</th>
+        </tr>
+
+        <tr>
+            <td rowspan="2">Macronutrients</td>
+            <td>Carbohidrates</td>
+            <td>45g</td>
+        </tr>
+        <tr>
+            <td>protein</td>
+            <td>9g</td>
+        </tr>
+        <tr>
+            <td>Micrunutriens</td>
+            <td>sodium</td>
+            <td>520mg</td>
+        </tr>
+        <tr>
+            <td colspan="3">Note: values are calculated per serving size(200g)</td>
+        </tr>
+    </table>
+
+    <h2>Recipe Preview and resources</h2>
+
+    <figure>
+        <img src="https://i.pinimg.com/736x/75/b3/42/75b342c9b3d9b3be0e287f6f1e046318.jpg"
+            alt="Deicious homemade fried rice plated with cucumber">
+        <figcaption>Figure 1 : serving suggestion for homemade fried rice with fresh garnish</figcaption>
+    </figure>
+
+    <p>Want ot explore more cooking ideas? check our <a href="https://cookpad.com/id/" target="_blank"
+            title="resep online">Cookpad</a>
+        online recipe collection
+    </p>
+
+    <p>
+        Have question about this dish?
+        <a href="#instruction-section">jump to this section</a>
+    </p>
+
+    <h2>leave a review (for HTML testing)</h2>
+    <form action="">
+        <p>
+            <label for="reviewer-name">Your Name:</label>
+            <input type="text" id="reviewer-name" name="name" placeholder="John Doe" required>
+        </p>
+
+        <p>
+            <label for="reviewer-email">Your Email:</label>
+            <input type="email" id="reviewer-email" name="email" placeholder="[EMAIL_ADDRESS]" required>
+        </p>
+
+        <p>
+            <label for="reviewer-password">Your Password:</label>
+            <input type="password" id="reviewer-name" name="name" placeholder="John Doe" required>
+        </p>
+
+        <p>
+            <label for="reviewer-message">Your Message:</label>
+            <textarea id="reviewer-message" name="message" rows="4" placeholder="Type your review here..."
+                required></textarea>
+        </p>
+
+        <p>
+            <label>Rate this recipe:</label>
+            <input type="radio" id="rating-5" name="rating" value="5">
+            <label for="rating-5">5 (Excellent)</label>
+            <input type="radio" id="rating-4" name="rating" value="4">
+            <label for="rating-4">4 (Very Good)</label>
+            <input type="radio" id="rating-3" name="rating" value="3">
+            <label for="rating-3">3 (Good)</label>
+            <input type="radio" id="rating-2" name="rating" value="2">
+            <label for="rating-2">2 (Fair)</label>
+            <input type="radio" id="rating-1" name="rating" value="1">
+            <label for="rating-1">1 (Poor)</label>
+        </p>
+
+        <p>
+            <label for="reviewer-fav-ingredient">Favorite Ingredient:</label>
+            <select id="reviewer-fav-ingredient" name="ingredient">
+                <option value="">Select an ingredient</option>
+                <option value="rice">Rice</option>
+                <option value="garlic">Garlic</option>
+                <option value="soy-sauce">Soy Sauce</option>
+                <option value="egg">Egg</option>
+                <option value="vegetable-oil">Vegetable Oil</option>
+            </select>
+        </p>
+
+        <p>
+            <label>Additional Options:</label><br>
+            <input type="checkbox" id="option-spicy" name="options" value="spicy">
+            <label for="option-spicy">Add extra spice</label><br>
+            <input type="checkbox" id="option-vegetarian" name="options" value="vegetarian">
+            <label for="option-vegetarian">Make it vegetarian</label><br>
+            <input type="checkbox" id="option-delivery" name="options" value="delivery">
+            <label for="option-delivery">Delivery option</label>
+        </p>
+
+        <p>
+            <input type="submit" value="Submit Review">
+            <input type="reset" value="Clear Form">
+        </p>
+    </form>
+</body>
+
+</html>
