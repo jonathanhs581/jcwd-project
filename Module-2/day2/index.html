@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="style.css">
+	<title>Advance CSS</title>
+</head>
+
+<body>
+	<div class="box static">Static</div>
+
+	<div class="parent">
+		<div class="relative">Relative</div>
+		<div class="box absolute">Absolute</div>
+	</div>
+
+	<div class="box fixed">Fixed</div>
+
+	<div class="box sticky">Sticky</div>
+
+	<section class="mq-container">
+		<h2>Media Query Demo</h2>
+
+		<div class="mq-card">Card1</div>
+		<div class="mq-card">Card2</div>
+
+		<picture>
+			<source media="(min-width:600px)"
+				srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ4AAACUCAMAAABV5TcGAAAAFVBMVEX19/va5/Po7/fv8/nf6vTk7fbq8ffl/apfAAADB0lEQVR4nO2c23qDMAyDlwTy/o+8dnQMQw7mMJwg/bvfl6qybJKUry9CCCGEEEIIIYQQQgghhBBCCCGEEEIIIaRDQozR+xhDsF6JPcGPg5sYBh+xFYmzFr+SeOsl2RFGt2WI1ssyIg4JNV6M1gszwWfUeBnEemkG+JwYkHrkKgVTj1BUwzmwBpPqKQKoASTW1MAql6o5oOxRNweUPUpNFs8etbYyATOcamoFqFpUtUI5VqCEh6LNUo4NKBsflENAOQSMUgEbrYByCDikS1RZipKkfMBfoakWpN1SRZhaL/FWqvbASY43tXLBaSsT5XIBytEPxWZrvTgDCnqgPK0IcvWCVykTIakG0sCxYmuQAbJQZuS8PmKL8cP7vtzrb/RP1CLweuiCn2kTbabMERiIS+YnEdTZQbDom6wX+ZgKPE19EEMV40PuYaDHx3riBo+PzQYXdHwkHsewNjwFqd1P4DhNbubAxkdmaxw1PnLnjJjxkT03wYyP/LEJYnyUDtUA46N4QwGuXConrtbLu5vK9RWwh7nq7RWs+EifpqHGh+ZqE5AemmuiOPHBW6IC3jBfojMHjB5KcziQaUxrDow41ZsDYhrTm8MBxIfuF8JzuTxdj11qPH762GcO9/T42KvGs7eS97SVD0+Oj/1qKO5KhvfbGG9Z/sUcMIerxen0FsJh7LCoDqlRjo+/V81114SOmaMYH8tfMfSmx0E1CvEhBe6rXo6aw2Wnj9V/7KsJHVcj88Vv9O2pXJRvnciQ+OITE25HepxSI1EIqXm/n3I5Z45tfKSTqBt77NrnSCHjI3dy1ckj31lzOBkf+XO8PrrtaXMIPQr7BF2UywXmcPM4Vj6a6EGPK8zxZhj9+sXxG9ovlxMD6X7a77ZXmUNH6+VyTXLoabtc1KeyV9F2udxtjrbL5XZzuKaH01vbyi/NlouFORo+/TcxR7PlYmMO12q5GJmj0XIxM0eb3dbMHK7F4dTQHK7Bu3aW5mgvPup38f8X68+/wtYcrclhbY7G5LA2R1tymJvDfQO3URsPpVTVPQAAAABJRU5ErkJggg==">
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ4AAACUCAMAAABV5TcGAAAAFVBMVEX19/va5/Po7/fv8/nf6vTk7fbq8ffl/apfAAADB0lEQVR4nO2c23qDMAyDlwTy/o+8dnQMQw7mMJwg/bvfl6qybJKUry9CCCGEEEIIIYQQQgghhBBCCCGEEEIIIaRDQozR+xhDsF6JPcGPg5sYBh+xFYmzFr+SeOsl2RFGt2WI1ssyIg4JNV6M1gszwWfUeBnEemkG+JwYkHrkKgVTj1BUwzmwBpPqKQKoASTW1MAql6o5oOxRNweUPUpNFs8etbYyATOcamoFqFpUtUI5VqCEh6LNUo4NKBsflENAOQSMUgEbrYByCDikS1RZipKkfMBfoakWpN1SRZhaL/FWqvbASY43tXLBaSsT5XIBytEPxWZrvTgDCnqgPK0IcvWCVykTIakG0sCxYmuQAbJQZuS8PmKL8cP7vtzrb/RP1CLweuiCn2kTbabMERiIS+YnEdTZQbDom6wX+ZgKPE19EEMV40PuYaDHx3riBo+PzQYXdHwkHsewNjwFqd1P4DhNbubAxkdmaxw1PnLnjJjxkT03wYyP/LEJYnyUDtUA46N4QwGuXConrtbLu5vK9RWwh7nq7RWs+EifpqHGh+ZqE5AemmuiOPHBW6IC3jBfojMHjB5KcziQaUxrDow41ZsDYhrTm8MBxIfuF8JzuTxdj11qPH762GcO9/T42KvGs7eS97SVD0+Oj/1qKO5KhvfbGG9Z/sUcMIerxen0FsJh7LCoDqlRjo+/V81114SOmaMYH8tfMfSmx0E1CvEhBe6rXo6aw2Wnj9V/7KsJHVcj88Vv9O2pXJRvnciQ+OITE25HepxSI1EIqXm/n3I5Z45tfKSTqBt77NrnSCHjI3dy1ckj31lzOBkf+XO8PrrtaXMIPQr7BF2UywXmcPM4Vj6a6EGPK8zxZhj9+sXxG9ovlxMD6X7a77ZXmUNH6+VyTXLoabtc1KeyV9F2udxtjrbL5XZzuKaH01vbyi/NlouFORo+/TcxR7PlYmMO12q5GJmj0XIxM0eb3dbMHK7F4dTQHK7Bu3aW5mgvPup38f8X68+/wtYcrclhbY7G5LA2R1tymJvDfQO3URsPpVTVPQAAAABJRU5ErkJggg=="
+				alt="responsive banner">
+	</section>
+
+	<section class="grid-container">
+		<h2>CSS Grid Demo</h2>
+
+		<div class="manual-grid">
+			<div class="grid-box box-main">Main Content (column 1-2)</div>
+			<div class="grid-box box-side">Sidebar (column 3, row 1-2)</div>
+			<div class="grid-box">Box A</div>
+			<div class="grid-box">Box B</div>
+		</div>
+	</section>
+
+	<section class="flex-container-demo">
+		<h2>Flexbox Core Properties Demo</h2>
+
+		<h3>Flex Direction (coloumn) & Gap</h3>
+		<div class="flex-dir-demo">
+			<div class="flex-item">Item 1 (row/coloumn direction)</div>
+			<div class="flex-item">item 2</div>
+		</div>
+	</section>
+
+	<section class="transform container demo">
+		<h2 style="color: white">2D transform demo</h2>
+
+		<h3 style="color: white">Transform Translate</h3>
+
+		<div class="transform-box translate-demo">Hover me</div>
+
+		<h3 style="color: white">Transform Rotate</h3>
+		<div class="transform-box rotate-demo">Hover me (Rotate me 45deg)</div>
+	</section>
+
+
+
+</body>
+
+</html>

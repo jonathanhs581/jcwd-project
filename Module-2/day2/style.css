@@ -1,0 +1,221 @@
+:root {
+    --bg-color: #f0f2f5;
+    --box-bg: #3b82f6;
+    --text-color: #ffffff;
+    --accent-color: #ef4444;
+    --card-bg: #ffffff;
+    --card-text: #ef4444;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+    height: 200vh;
+}
+
+.box {
+    background-color: var(--box-bg);
+    color: var(--text-color);
+    padding: 10px;
+    margin: 10px 0;
+    width: 100px;
+    text-align: center;
+}
+
+.static {
+    position: static;
+
+}
+
+.parent {
+    position: relative;
+    height: 300px;
+    margin: 20px;
+}
+
+.relative {
+    position: relative;
+    top: 10px;
+    left: 20px;
+    color: #f59e0b;
+}
+
+.absolute {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--accent-color);
+}
+
+.sticky {
+    position: sticky;
+    top: 0;
+    background-color: #10b981;
+}
+
+.fixed {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: #f59e0b;
+}
+
+.mq-container {
+    margin-top: 40px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    color: var(--card-text);
+}
+
+.mq-card {
+    background-color: var(--box-bg);
+    color: var(--text-color);
+    padding: 15px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+@media (min-width: 600px) {
+    .mq-card {
+        font-size: 20px;
+        background-color: #10b981;
+    }
+}
+
+@media(min-width: 768px) {
+    .mq-container {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .mq-card {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}
+
+/* case 3 : mengubah warna otomatis (preferensi perangkat) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #0f172a;
+        --card-bg: #1e293b;
+        --card-text: #f8fafc;
+    }
+}
+
+.grid-container {
+    margin-top: 40px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    color: var(--card-text);
+}
+
+.grid-box {
+    width: auto;
+    min-height: 120px;
+    background-color: var(--box-bg);
+    color: var(--text-color);
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    display: flex;
+    /* teks nempel rapi di tengah */
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.manual-grid {
+    margin-bottom: 25px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+/* warna dasar per kotak — placement manualnya nggak di sini,
+   biar di mobile semua numpuk 1 kolom secara default */
+.box-main {
+    background-color: var(--accent-color);
+}
+
+.box-side {
+    background-color: #10b981;
+}
+
+/* desktop: layout 3 kolom baru dipasang */
+@media (min-width: 768px) {
+    .manual-grid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 kolom sama lebar */
+    }
+
+    /* Main Content: nempel di garis kolom 1-3 (lebar 2 kolom) */
+    .box-main {
+        grid-column: 1 / 3;
+    }
+
+    /* Sidebar: kolom terakhir (garis 3), tinggi 2 baris (garis 1-3) */
+    .box-side {
+        grid-column: 3;
+        grid-row: 1 / 3;
+    }
+}
+
+.flex-container-demo {
+    margin-top: 40px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    color: var(--card-text);
+}
+
+.flex-item {
+    padding: 12px;
+    background-color: var(--box-bg);
+    color: var(--text-color);
+    font-weight: 600;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.flex-dir-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 2d transform demo */
+
+.transform-demo {
+    margin-top: 40px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    color: var(--card-text);
+}
+
+.transform-box {
+    background-color: var(--box-bg);
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+    border-radius: 4px;
+    margin-bottom: 25px;
+    width: 150px;
+
+    transition: transform 0.1s ease;
+}
+
+/* menggeser elemen: 20px ke kanan sumbu x dan 10px ke bawah sumbu y */
+.transform-box:hover {
+    transform: translate(20px, 10px);
+    background-color: #ef4444;
+}
+
+.rotate-demo:hover {
+    transform: rotate(45deg);
+    background-color: greenyellow;
+}

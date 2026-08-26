@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dino Hunter 🦖</title>
+	<style>
+		/* ===== Layout halaman ===== */
+		body {
+			margin: 0;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 16px;
+			font-family: 'Segoe UI', Tahoma, sans-serif;
+			/* tema gelap biar warna game-nya pop */
+			background: linear-gradient(160deg, #1a1a2e 0%, #16213e 100%);
+			color: #e2e8f0;
+		}
+
+		h1 {
+			margin: 0;
+			font-size: 28px;
+			letter-spacing: 2px;
+			color: #fbbf24;
+			text-shadow: 0 2px 8px rgba(251, 191, 36, .35);
+		}
+
+		/* canvas-nya responsif: lebar maksimal 800px, tinggi ikut rasio */
+		canvas {
+			width: min(800px, 92vw);
+			height: auto;
+			border-radius: 12px;
+			box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+			cursor: pointer;
+		}
+
+		.hint {
+			font-size: 14px;
+			color: #94a3b8;
+		}
+
+		.hint b {
+			color: #fbbf24;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>DINO HUNTER 🦖</h1>
+	<canvas id="game" width="800" height="300"></canvas>
+	<p class="hint">Tekan <b>SPASI</b> / <b>klik</b> untuk lompat &amp; mulai ulang</p>
+
+	<script>
+		// ============================================================
+		// DINO HUNTER — game runner sederhana dalam 1 file
+		// Konsep: game loop (requestAnimationFrame) + physics lompat
+		//         + deteksi tabrakan AABB (kotak vs kotak)
+		// ============================================================
+
+		const canvas = document.getElementById('game');
+		const ctx = canvas.getContext('2d');
+
+		// ----- Konstanta gameplay (semua angka di-tuning di sini) -----
+		const GROUND_Y = 250;          // posisi tanah (garis)
+		const GRAVITY = 1800;          // px per detik^2 — kekuatan tarikan bawah
+		const JUMP_V = -620;           // kecepatan awal lompat (negatif = ke atas)
+		const START_SPEED = 320;       // kecepatan awal dunia (px/detik)
+		const MAX_SPEED = 700;         // kecepatan maksimal (biar tetap main-able)
+
+		// ----- Warna-warni biar nggak muram kayak dino chrome -----
+		const COLORS = {
+			skyTop: '#7dd3fc',
+			skyBottom: '#fde68a',
+			sun: '#fb923c',
+			ground: '#a16207',
+			groundDark: '#854d0e',
+			dino: '#7c3aed',
+			dinoDark: '#5b21b6',
+			dinoEye: '#ffffff',
+			cactus: '#059669',
+			cactusDark: '#065f46',
+			cloud: '#ffffff',
+			text: '#1f2937',
+			danger: '#ef4444'
+		};
+
+		// ----- State game -----
+		// 'ready' = layar awal, 'playing' = main, 'over' = game over
+		let state = 'ready';
+		let score = 0;
+		let hiScore = Number(localStorage.getItem('dinoHiScore') || 0);
+		let speed = START_SPEED;
+		let elapsed = 0;               // total waktu main (buat animasi)
+
+		// ----- Dino (pemain) -----
+		const dino = {
+			x: 70,
+			y: GROUND_Y,               // y = posisi KAKI dino
+			vy: 0,                     // kecepatan vertikal
+			w: 44,
+			h: 48,
+			jumping: false
+		};
+
+		// ----- Objek dunia -----
+		let obstacles = [];            // kaktus-kaktus
+		let clouds = [];               // awan hiasan
+		let groundBumps = [];          // tekstur tanah yang bergeser
+		let nextObstacleIn = 1;        // jeda (detik) sebelum kaktus berikutnya
+
+		// ------------------------------------------------------------
+		// UTIL: deteksi tabrakan AABB dengan margin (kalau nabrak,
+		// hit box-nya dibuat sedikit lebih kecil biar terasa adil)
+		// ------------------------------------------------------------
+		function hit(a, b, margin = 0) {
+			return a.x + margin < b.x + b.w &&
+				a.x + a.w - margin > b.x &&
+				a.y + margin < b.y + b.h &&
+				a.y + a.h - margin > b.y;
+		}
+
+		function rand(min, max) {
+			return min + Math.random() * (max - min);
+		}
+
+		// ------------------------------------------------------------
+		// RESET: dipanggil tiap mulai game supaya state bersih (anti bug)
+		// ------------------------------------------------------------
+		function resetGame() {
+			score = 0;
+			speed = START_SPEED;
+			elapsed = 0;
+			obstacles = [];
+			nextObstacleIn = 1;
+			dino.y = GROUND_Y;
+			dino.vy = 0;
+			dino.jumping = false;
+			state = 'playing';
+		}
+
+		// ------------------------------------------------------------
+		// INPUT: lompat / mulai / restart
+		// ------------------------------------------------------------
+		function pressAction() {
+			if (state === 'ready' || state === 'over') {
+				resetGame();
+			} else if (!dino.jumping) {
+				dino.vy = JUMP_V;
+				dino.jumping = true;
+			}
+		}
+
+		// keydown: cek e.repeat biar nahan spasi nggak lompat berulang
+		window.addEventListener('keydown', (e) => {
+			if (e.code === 'Space' || e.code === 'ArrowUp') {
+				e.preventDefault();      // cegah halaman scroll saat spasi
+				if (!e.repeat) pressAction();
+			}
+		});
+		canvas.addEventListener('mousedown', pressAction);
+		canvas.addEventListener('touchstart', (e) => {
+			e.preventDefault();         // cegah zoom dobel-tap di HP
+			pressAction();
+		}, { passive: false });
+
+		// ------------------------------------------------------------
+		// SPAWNER: kaktus, awan, tekstur tanah
+		// ------------------------------------------------------------
+		function spawnObstacle() {
+			// variasi: kaktus kecil sendiri, besar sendiri, atau gerombolan
+			const type = Math.random();
+			let w, h;
+			if (type < 0.4) { w = 22; h = 42; }        // kecil
+			else if (type < 0.75) { w = 30; h = 58; }  // besar
+			else { w = 58; h = 42; }                   // gerombolan 2
+			obstacles.push({
+				x: canvas.width + 20,
+				y: GROUND_Y - h,
+				w, h
+			});
+		}
+
+		function spawnCloud() {
+			clouds.push({
+				x: canvas.width + rand(40, 200),
+				y: rand(30, 120),
+				size: rand(18, 34),
+				speedFactor: rand(0.15, 0.35)   // awan lebih lambat = efek kedalaman
+			});
+		}
+
+		function spawnGroundBump() {
+			groundBumps.push({
+				x: canvas.width + rand(0, 100),
+				w: rand(8, 30)
+			});
+		}
+
+		// isi awan & tekstur awal biar layar ready nggak kosong
+		for (let i = 0; i < 4; i++) {
+			clouds.push({ x: rand(0, canvas.width), y: rand(30, 120), size: rand(18, 34), speedFactor: rand(0.15, 0.35) });
+		}
+		for (let i = 0; i < 12; i++) {
+			groundBumps.push({ x: rand(0, canvas.width), w: rand(8, 30) });
+		}
+
+		// ------------------------------------------------------------
+		// UPDATE: logika per frame. dt = delta time (detik) biar
+		// kecepatan konsisten di semua refresh rate (60/120/144 Hz)
+		// ------------------------------------------------------------
+		function update(dt) {
+			// awan & tekstur tanah tetap bergerak walau di layar ready (hidup)
+			for (const c of clouds) {
+				c.x -= speed * c.speedFactor * dt;
+				if (c.x < -80) { c.x = canvas.width + rand(40, 200); c.y = rand(30, 120); }
+			}
+			for (const g of groundBumps) {
+				g.x -= speed * dt;
+				if (g.x + g.w < 0) g.x = canvas.width + rand(0, 100);
+			}
+
+			if (state !== 'playing') return;
+
+			elapsed += dt;
+			score += speed * dt * 0.05;   // skor naik seiring jarak tempuh
+			speed = Math.min(MAX_SPEED, START_SPEED + elapsed * 14);  // makin lama makin ngebut
+
+			// --- physics dino ---
+			dino.vy += GRAVITY * dt;
+			dino.y += dino.vy * dt;
+			if (dino.y >= GROUND_Y) {     // mendarat
+				dino.y = GROUND_Y;
+				dino.vy = 0;
+				dino.jumping = false;
+			}
+
+			// --- spawner kaktus ---
+			nextObstacleIn -= dt;
+			if (nextObstacleIn <= 0) {
+				spawnObstacle();
+				// jeda menyesuaikan kecepatan: makin cepat, jeda jaraknya mirip
+				nextObstacleIn = rand(0.9, 1.6) * (START_SPEED / speed) + 0.35;
+			}
+
+			// --- gerak & bersih-bersih kaktus ---
+			for (const o of obstacles) o.x -= speed * dt;
+			obstacles = obstacles.filter(o => o.x + o.w > -10);
+
+			// --- cek tabrakan (margin 6px biar terasa adil) ---
+			const dinoBox = { x: dino.x, y: dino.y - dino.h, w: dino.w, h: dino.h };
+			for (const o of obstacles) {
+				if (hit(dinoBox, o, 6)) {
+					state = 'over';
+					if (score > hiScore) {
+						hiScore = Math.floor(score);
+						localStorage.setItem('dinoHiScore', hiScore);
+					}
+					break;
+				}
+			}
+		}
+
+		// ------------------------------------------------------------
+		// DRAW: semua render ada di sini
+		// ------------------------------------------------------------
+		function drawDino() {
+			const x = dino.x, y = dino.y - dino.h;
+			ctx.save();
+			// badan
+			ctx.fillStyle = COLORS.dino;
+			ctx.beginPath();
+			ctx.roundRect(x, y, dino.w, dino.h, [10, 14, 4, 4]);
+			ctx.fill();
+			// ekor
+			ctx.beginPath();
+			ctx.roundRect(x - 10, y + 18, 14, 12, 4);
+			ctx.fill();
+			// kepala
+			ctx.beginPath();
+			ctx.roundRect(x + 18, y - 12, 26, 24, 8);
+			ctx.fill();
+			// mata
+			ctx.fillStyle = COLORS.dinoEye;
+			ctx.beginPath();
+			ctx.arc(x + 38, y - 4, 3.5, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.fillStyle = COLORS.text;
+			ctx.beginPath();
+			ctx.arc(x + 39, y - 4, 1.8, 0, Math.PI * 2);
+			ctx.fill();
+
+			// kaki: 2 frame animasi lari (bergantian tiap ~0.1 detik)
+			if (!dino.jumping && state === 'playing') {
+				const frame = Math.floor(elapsed * 10) % 2;
+				ctx.fillStyle = COLORS.dino;
+				ctx.beginPath();
+				ctx.roundRect(x + (frame === 0 ? 6 : 22), y + dino.h - 4, 12, 10, 4);
+				ctx.fill();
+			} else {
+				// sedang lompat: kedua kaka menekuk
+				ctx.fillStyle = COLORS.dino;
+				ctx.beginPath();
+				ctx.roundRect(x + 8, y + dino.h - 4, 12, 8, 4);
+				ctx.fill();
+				ctx.beginPath();
+				ctx.roundRect(x + 22, y + dino.h - 4, 12, 8, 4);
+				ctx.fill();
+			}
+			ctx.restore();
+		}
+
+		function drawObstacle(o) {
+			ctx.fillStyle = COLORS.cactus;
+			ctx.beginPath();
+			ctx.roundRect(o.x, o.y, o.w, o.h, [6, 6, 2, 2]);
+			ctx.fill();
+			// duri kaktus kiri-kanan
+			ctx.fillStyle = COLORS.cactusDark;
+			ctx.beginPath();
+			ctx.roundRect(o.x - 5, o.y + o.h * 0.3, 6, o.h * 0.3, 3);
+			ctx.fill();
+			ctx.beginPath();
+			ctx.roundRect(o.x + o.w - 1, o.y + o.h * 0.45, 6, o.h * 0.3, 3);
+			ctx.fill();
+		}
+
+		function drawCloud(c) {
+			ctx.fillStyle = COLORS.cloud;
+			ctx.globalAlpha = 0.9;
+			ctx.beginPath();
+			ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+			ctx.arc(c.x + c.size * 0.9, c.y + 4, c.size * 0.7, 0, Math.PI * 2);
+			ctx.arc(c.x - c.size * 0.8, c.y + 6, c.size * 0.6, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.globalAlpha = 1;
+		}
+
+		function drawScore() {
+			ctx.font = 'bold 18px "Segoe UI", sans-serif';
+			ctx.fillStyle = COLORS.text;
+			ctx.textAlign = 'right';
+			ctx.fillText(`HI ${String(Math.floor(hiScore)).padStart(5, '0')}  ${String(Math.floor(score)).padStart(5, '0')}`, canvas.width - 20, 34);
+		}
+
+		function draw() {
+			// langit: gradasi senja yang ceria
+			const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+			sky.addColorStop(0, COLORS.skyTop);
+			sky.addColorStop(1, COLORS.skyBottom);
+			ctx.fillStyle = sky;
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			// matahari
+			ctx.fillStyle = COLORS.sun;
+			ctx.beginPath();
+			ctx.arc(canvas.width - 130, 70, 32, 0, Math.PI * 2);
+			ctx.fill();
+
+			for (const c of clouds) drawCloud(c);
+
+			// tanah
+			ctx.fillStyle = COLORS.ground;
+			ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+			ctx.fillStyle = COLORS.groundDark;
+			ctx.fillRect(0, GROUND_Y, canvas.width, 3);
+			for (const g of groundBumps) {
+				ctx.beginPath();
+				ctx.roundRect(g.x, GROUND_Y + 14, g.w, 4, 2);
+				ctx.fill();
+			}
+
+			for (const o of obstacles) drawObstacle(o);
+			drawDino();
+			drawScore();
+
+			// overlay teks sesuai state
+			ctx.textAlign = 'center';
+			if (state === 'ready') {
+				ctx.fillStyle = COLORS.text;
+				ctx.font = 'bold 30px "Segoe UI", sans-serif';
+				ctx.fillText('DINO HUNTER 🦖', canvas.width / 2, 120);
+				ctx.font = '16px "Segoe UI", sans-serif';
+				ctx.fillText('Tekan SPASI atau klik untuk mulai', canvas.width / 2, 150);
+			} else if (state === 'over') {
+				ctx.fillStyle = 'rgba(239, 68, 68, .92)';
+				ctx.font = 'bold 34px "Segoe UI", sans-serif';
+				ctx.fillText('GAME OVER!', canvas.width / 2, 115);
+				ctx.fillStyle = COLORS.text;
+				ctx.font = '16px "Segoe UI", sans-serif';
+				ctx.fillText(`Skor: ${Math.floor(score)}   |   Terbaik: ${hiScore}`, canvas.width / 2, 145);
+				ctx.fillText('Tekan SPASI atau klik untuk main lagi', canvas.width / 2, 170);
+			}
+		}
+
+		// ------------------------------------------------------------
+		// GAME LOOP: pakai delta time biar kecepatan game sama
+		// rata di monitor 60Hz maupun 144Hz (anti bug klasik!)
+		// ------------------------------------------------------------
+		let lastTime = performance.now();
+		function loop(now) {
+			const dt = Math.min((now - lastTime) / 1000, 0.05); // clamp dt anti lompatan saat tab idle
+			lastTime = now;
+			update(dt);
+			draw();
+			requestAnimationFrame(loop);
+		}
+		requestAnimationFrame(loop);
+	</script>
+
+</body>
+
+</html>
